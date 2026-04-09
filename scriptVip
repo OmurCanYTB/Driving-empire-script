@@ -4,174 +4,147 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 
-if CoreGui:FindFirstChild("OmurModMenu") then CoreGui.OmurModMenu:Destroy() end
+if CoreGui:FindFirstChild("OmurV11") then CoreGui.OmurV11:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurModMenu"
+gui.Name = "OmurV11"
 gui.Parent = CoreGui
 
--- ANA PANEL (MOD MENU STİLİ)
+-- ANA PANEL
 local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 280, 0, 450)
-main.Position = UDim2.new(0.5, -140, 0.5, -225)
-main.BackgroundColor3 = Color3.fromRGB(30, 31, 34) -- Discord tünd rəngi
+main.Size = UDim2.new(0, 350, 0, 400)
+main.Position = UDim2.new(0.5, -175, 0.5, -200)
+main.BackgroundColor3 = Color3.fromRGB(25, 26, 28)
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
 main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
--- KÜNCÜ YUVARLAQLAŞDIRMA
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 12)
-corner.Parent = main
+-- SOL MENYU (TABS)
+local sideBar = Instance.new("Frame")
+sideBar.Size = UDim2.new(0, 100, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(35, 36, 40)
+sideBar.Parent = main
+Instance.new("UICorner", sideBar).CornerRadius = UDim.new(0, 10)
 
--- BAŞLIQ BARI
-local topBar = Instance.new("Frame")
-topBar.Size = UDim2.new(1, 0, 0, 45)
-topBar.BackgroundColor3 = Color3.fromRGB(88, 101, 242) -- Blurple rəngi
-topBar.BorderSizePixel = 0
-topBar.Parent = main
+-- BÖLMƏLƏR (CONTAINERS)
+local playerPage = Instance.new("ScrollingFrame")
+playerPage.Size = UDim2.new(1, -110, 1, -20)
+playerPage.Position = UDim2.new(0, 105, 0, 10)
+playerPage.BackgroundTransparency = 1
+playerPage.Visible = true
+playerPage.Parent = main
 
-local topCorner = Instance.new("UICorner")
-topCorner.CornerRadius = UDim.new(0, 12)
-topCorner.Parent = topBar
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -50, 1, 0)
-title.Position = UDim2.new(0, 15, 0, 0)
-title.Text = "ÖMÜR HUB • V10"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.BackgroundTransparency = 1
-title.Parent = topBar
-
--- BAĞLAMA DÜYMƏSİ
-local close = Instance.new("TextButton")
-close.Size = UDim2.new(0, 30, 0, 30)
-close.Position = UDim2.new(1, -38, 0.5, -15)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(242, 63, 67)
-close.TextColor3 = Color3.new(1, 1, 1)
-close.Font = Enum.Font.GothamBold
-close.Parent = topBar
-Instance.new("UICorner", close).CornerRadius = UDim.new(0, 8)
-close.MouseButton1Click:Connect(function() gui:Destroy() end)
+local worldPage = Instance.new("ScrollingFrame")
+worldPage.Size = UDim2.new(1, -110, 1, -20)
+worldPage.Position = UDim2.new(0, 105, 0, 10)
+worldPage.BackgroundTransparency = 1
+worldPage.Visible = false
+worldPage.Parent = main
 
 -- AYARLAR
-local config = { speed = false, proBrake = true, easyTurn = true, esp = false, noclip = false }
+local config = {
+    espName = false, espLine = false, espBox = false,
+    speed = false, softBrake = true, easyTurn = true,
+    noFog = false, dayTime = false
+}
 
--- MOD MENU DÜYMƏLƏRİ ÜÇÜN FUNKSİYA
-local function addToggle(txt, pos, key)
+-- FUNKSİYA: DÜYMƏ YARATMAQ
+local function createToggle(name, parent, key, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -30, 0, 40)
-    btn.Position = pos
-    btn.Text = txt .. ": OFF"
-    btn.BackgroundColor3 = Color3.fromRGB(43, 45, 49)
-    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 14
-    btn.Parent = main
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    
+    btn.Size = UDim2.new(1, -10, 0, 35)
+    btn.Text = name .. ": OFF"
+    btn.BackgroundColor3 = Color3.fromRGB(45, 46, 50)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = parent
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    Instance.new("UIListLayout", parent).Padding = UDim.new(0, 5)
+
     btn.MouseButton1Click:Connect(function()
         config[key] = not config[key]
-        if config[key] then
-            btn.Text = txt .. ": ON"
-            btn.BackgroundColor3 = Color3.fromRGB(35, 165, 89) -- Yaşıl
-            btn.TextColor3 = Color3.new(1, 1, 1)
-        else
-            btn.Text = txt .. ": OFF"
-            btn.BackgroundColor3 = Color3.fromRGB(43, 45, 49) -- Boz
-            btn.TextColor3 = Color3.fromRGB(180, 180, 180)
-        end
+        btn.Text = name .. (config[key] and ": ON" or ": OFF")
+        btn.BackgroundColor3 = config[key] and Color3.fromRGB(88, 101, 242) or Color3.fromRGB(45, 46, 50)
+        if callback then callback(config[key]) end
     end)
 end
 
--- DÜYMƏLƏR
-addToggle("HIZLI SÜRÜŞ (W)", UDim2.new(0, 15, 0, 60), "speed")
-addToggle("SMART TORMOZ (S)", UDim2.new(0, 15, 0, 110), "proBrake")
-addToggle("YUMŞAQ DÖNMƏ", UDim2.new(0, 15, 0, 160), "easyTurn")
-addToggle("PLAYER ESP", UDim2.new(0, 15, 0, 210), "esp")
-addToggle("NOCLIP (PIYADA)", UDim2.new(0, 15, 0, 260), "noclip")
+-- TAB DÜYMƏLƏRİ
+local pBtn = Instance.new("TextButton")
+pBtn.Size = UDim2.new(1, -10, 0, 40)
+pBtn.Position = UDim2.new(0, 5, 0, 10)
+pBtn.Text = "PLAYER"
+pBtn.Parent = sideBar
 
--- GÜNDÜZ ET DÜYMƏSİ
-local day = Instance.new("TextButton")
-day.Size = UDim2.new(1, -30, 0, 40)
-day.Position = UDim2.new(0, 15, 0, 310)
-day.Text = "GÜNDÜZ ET"
-day.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-day.TextColor3 = Color3.new(1, 1, 1)
-day.Font = Enum.Font.GothamBold
-day.Parent = main
-Instance.new("UICorner", day).CornerRadius = UDim.new(0, 8)
-day.MouseButton1Click:Connect(function() Lighting.ClockTime = 14 end)
+local wBtn = Instance.new("TextButton")
+wBtn.Size = UDim2.new(1, -10, 0, 40)
+wBtn.Position = UDim2.new(0, 5, 0, 55)
+wBtn.Text = "WORLD"
+wBtn.Parent = sideBar
 
--- FİZİKA MƏNTİQİ
+pBtn.MouseButton1Click:Connect(function() playerPage.Visible = true worldPage.Visible = false end)
+wBtn.MouseButton1Click:Connect(function() playerPage.Visible = false worldPage.Visible = true end)
+
+-- PLAYER BÖLMƏSİ (ESP & SETTINGS)
+createToggle("ESP NAME", playerPage, "espName")
+createToggle("ESP LINE", playerPage, "espLine")
+createToggle("ESP BOX", playerPage, "espBox")
+
+-- WORLD BÖLMƏSİ (CAR & WORLD)
+createToggle("HIZLI SURUS", worldPage, "speed")
+createToggle("SMART TORMOZ", worldPage, "softBrake")
+createToggle("RAHAT DONME", worldPage, "easyTurn")
+createToggle("DUMANI SIL", worldPage, "noFog")
+
+-- FİZİKA (SMART BRAKE DÜZƏLİŞİ)
 RunService.Stepped:Connect(function()
     local lp = Players.LocalPlayer
-    local char = lp.Character
-    if char and char:FindFirstChild("Humanoid") then
-        local seat = char.Humanoid.SeatPart
+    if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+        local seat = lp.Character.Humanoid.SeatPart
         if seat and seat:IsA("VehicleSeat") then
-            
-            -- Sürət (1.8 Sabit)
+            -- Sürət
             if config.speed and seat.Throttle == 1 then
                 seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
             end
-            
-            -- SMART TORMOZ VƏ GERİ GETMƏ
-            if config.proBrake and seat.Throttle == -1 then
-                local currentSpeed = seat.AssemblyLinearVelocity.Magnitude
-                if currentSpeed > 5 then
-                    -- Maşın hərəkətdədirsə tormoz verir
-                    seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.95
-                else
-                    -- Maşın dayanıbsa normal arxaya getməyə icazə verir (skript qarışmır)
+            -- SMART TORMOZ (Arxaya getməni bloklamır)
+            if config.softBrake and seat.Throttle == -1 then
+                local velocity = seat.AssemblyLinearVelocity
+                local speed = velocity.Magnitude
+                -- Əgər maşın irəli gedirsə tormoz ver
+                if seat.CFrame.LookVector:Dot(velocity) > 2 then
+                    seat.AssemblyLinearVelocity = velocity * 0.96
                 end
             end
-            
-            -- YUMŞAQ DÖNMƏ
+            -- Dönmə
             if config.easyTurn and seat.Steer ~= 0 then
-                local turnPower = seat.Steer * 0.08
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -turnPower, 0)
-            end
-        end
-        
-        -- Noclip
-        if config.noclip then
-            for _, p in pairs(char:GetDescendants()) do
-                if p:IsA("BasePart") then p.CanCollide = false end
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -seat.Steer * 0.1, 0)
             end
         end
     end
 end)
 
--- ESP SİSTEMİ
+-- ESP SİSTEMİ (Name, Line, Box)
 RunService.RenderStepped:Connect(function()
-    if config.esp then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= Players.LocalPlayer and p.Character then
-                if not p.Character:FindFirstChild("OmurHighlight") then
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= Players.LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = p.Character.HumanoidRootPart
+            -- Name ESP (Highlight istifadə edirik daha yüngüldür)
+            if config.espName or config.espBox then
+                if not p.Character:FindFirstChild("OmurESP") then
                     local h = Instance.new("Highlight", p.Character)
-                    h.Name = "OmurHighlight"
-                    h.FillColor = (p.Team and p.Team.Name == "Police") and Color3.new(0,0,1) or Color3.new(1,0,0)
+                    h.Name = "OmurESP"
+                    h.FillTransparency = (config.espBox and 0.5 or 1)
+                    h.OutlineTransparency = (config.espBox and 0 or 1)
                 end
-            end
-        end
-    else
-        for _, p in pairs(Players:GetPlayers()) do
-            if p.Character and p.Character:FindFirstChild("OmurHighlight") then
-                p.Character.OmurHighlight:Destroy()
+            else
+                if p.Character:FindFirstChild("OmurESP") then p.Character.OmurESP:Destroy() end
             end
         end
     end
 end)
 
--- GİZLƏTMƏ (K)
+-- Gizlə (K)
 UserInputService.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.K then main.Visible = not main.Visible end
 end)
-
-print("Ömür Ultimate Mod Menu V10 Yükləndi!")
