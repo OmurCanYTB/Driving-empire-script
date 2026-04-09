@@ -1,154 +1,135 @@
--- [[ DARK HUB V15 - CLEAN START & REVERSE FIX ]] --
+-- [[ DARK HUB V17 - BLACK & WHITE MINIMALIST EDITION ]] --
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 
--- 1. BÜTÜN KÖHNƏLƏRİ MƏCBURİ SİL (Force Cleanup)
+-- Köhnə interfeysləri mütləq sil
 for _, v in pairs(CoreGui:GetChildren()) do
-    if v:IsA("ScreenGui") and (v.Name:find("Omur") or v.Name:find("Dark")) then
+    if v:IsA("ScreenGui") and (v.Name:find("Dark") or v.Name:find("Omur")) then
         v:Destroy()
     end
 end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "DarkHubFinal"
+gui.Name = "DarkHubV17"
 gui.Parent = CoreGui
-gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
 
 local isAuth = false
 local menuKey = Enum.KeyCode.K
 
--- 2. LOGIN PANELI (Kod: dark)
+-- LOGIN PANEL (Ağ-Qara Rejim)
 local log = Instance.new("Frame")
-log.Size = UDim2.new(0, 280, 0, 140)
-log.Position = UDim2.new(0.5, -140, 0.5, -70)
-log.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+log.Size = UDim2.new(0, 280, 0, 150)
+log.Position = UDim2.new(0.5, -140, 0.5, -75)
+log.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+log.BorderSizePixel = 2
+log.BorderColor3 = Color3.fromRGB(255, 255, 255)
 log.Parent = gui
-Instance.new("UICorner", log)
+Instance.new("UICorner", log).CornerRadius = UDim.new(0, 5)
 
 local logTitle = Instance.new("TextLabel")
 logTitle.Size = UDim2.new(1, 0, 0, 35)
 logTitle.Text = "DARK HUB ACCESS"
-logTitle.TextColor3 = Color3.new(1, 1, 1)
-logTitle.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+logTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+logTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+logTitle.Font = Enum.Font.GothamBold
 logTitle.Parent = log
 
 local inp = Instance.new("TextBox")
-inp.Size = UDim2.new(0, 180, 0, 30)
-inp.Position = UDim2.new(0.5, -90, 0.45, 0)
-inp.PlaceholderText = "Kodu yaz..."
+inp.Size = UDim2.new(0, 200, 0, 30)
+inp.Position = UDim2.new(0.5, -100, 0.45, 0)
+inp.PlaceholderText = "Kod: dark"
 inp.Text = ""
+inp.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+inp.TextColor3 = Color3.fromRGB(255, 255, 255)
 inp.Parent = log
 
 local btnLog = Instance.new("TextButton")
-btnLog.Size = UDim2.new(0, 80, 0, 30)
-btnLog.Position = UDim2.new(0.5, -40, 0.75, 0)
-btnLog.Text = "GİRİŞ"
-btnLog.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+btnLog.Size = UDim2.new(0, 100, 0, 30)
+btnLog.Position = UDim2.new(0.5, -50, 0.75, 0)
+btnLog.Text = "ENTER"
+btnLog.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+btnLog.TextColor3 = Color3.fromRGB(0, 0, 0)
+btnLog.Font = Enum.Font.GothamBold
 btnLog.Parent = log
 
--- 3. ANA MENU
+-- ANA MENU
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 400, 0, 340)
-Main.Position = UDim2.new(0.5, -200, 0.5, -170)
-Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Main.Size = UDim2.new(0, 350, 0, 400)
+Main.Position = UDim2.new(0.5, -175, 0.5, -200)
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 2
+Main.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Main.Visible = false
 Main.Active = true
 Main.Draggable = true
 Main.Parent = gui
-Instance.new("UICorner", Main)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
 
-local side = Instance.new("Frame")
-side.Size = UDim2.new(0, 100, 1, 0)
-side.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-side.Parent = Main
+-- MENU SİLMƏ QUTUCUĞU (X)
+local exitBtn = Instance.new("TextButton")
+exitBtn.Size = UDim2.new(0, 30, 0, 30)
+exitBtn.Position = UDim2.new(1, -35, 0, 5)
+exitBtn.Text = "X"
+exitBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+exitBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+exitBtn.Font = Enum.Font.GothamBold
+exitBtn.Parent = Main
+Instance.new("UICorner", exitBtn)
+exitBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
 local pPage = Instance.new("ScrollingFrame")
-pPage.Size = UDim2.new(1, -110, 0, 200)
-pPage.Position = UDim2.new(0, 110, 0, 10)
-pPage.Visible = true
+pPage.Size = UDim2.new(1, -20, 1, -60)
+pPage.Position = UDim2.new(0, 10, 0, 40)
+pPage.BackgroundTransparency = 1
+pPage.ScrollBarThickness = 2
 pPage.Parent = Main
-
-local wPage = Instance.new("ScrollingFrame")
-wPage.Size = UDim2.new(1, -110, 0, 200)
-wPage.Position = UDim2.new(0, 110, 0, 10)
-wPage.Visible = false
-wPage.Parent = Main
-
-Instance.new("UIListLayout", pPage)
-Instance.new("UIListLayout", wPage)
+Instance.new("UIListLayout", pPage).Padding = UDim.new(0, 8)
 
 -- AYARLAR
-local conf = { eName = false, eBox = false, eLine = false, spd = false, brk = true, trn = true }
+local conf = { spd = false, brk = true, trn = true, stab = true, noclip = false }
 
-local function tgl(txt, par, key)
+local function tgl(txt, key)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, -10, 0, 35)
+    b.Size = UDim2.new(1, 0, 0, 40)
     b.Text = txt .. ": OFF"
-    b.Parent = par
+    b.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.BorderSizePixel = 1
+    b.BorderColor3 = Color3.fromRGB(100, 100, 100)
+    b.Font = Enum.Font.Gotham
+    b.Parent = pPage
+    
     b.MouseButton1Click:Connect(function()
         conf[key] = not conf[key]
         b.Text = txt .. (conf[key] and ": ON" or ": OFF")
-        b.BackgroundColor3 = conf[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
+        b.BackgroundColor3 = conf[key] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(20, 20, 20)
+        b.TextColor3 = conf[key] and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
     end)
 end
 
--- DÜYMƏLƏR
-tgl("ESP NAME", pPage, "eName")
-tgl("ESP BOX", pPage, "eBox")
-tgl("ESP LINE", pPage, "eLine")
-tgl("HIZLI SURUS", wPage, "spd")
-tgl("AKILLI TORMOZ", wPage, "brk")
-tgl("RAHAT DONME", wPage, "trn")
+tgl("HIZLI SURUS", "spd")
+tgl("AKILLI TORMOZ", "brk")
+tgl("RAHAT DONME", "trn")
+tgl("STABILLIK", "stab")
+tgl("CAR NOCLIP", "noclip")
 
--- KEYBIND AYARI
-local kBtn = Instance.new("TextButton")
-kBtn.Size = UDim2.new(0, 200, 0, 40)
-kBtn.Position = UDim2.new(0, 150, 1, -60)
-kBtn.Text = "MENU DÜYMƏSİ: K"
-kBtn.Parent = Main
-kBtn.MouseButton1Click:Connect(function()
-    kBtn.Text = "Basın..."
-    local c; c = UserInputService.InputBegan:Connect(function(i, g)
-        if not g and i.UserInputType == Enum.UserInputType.Keyboard then
-            menuKey = i.KeyCode
-            kBtn.Text = "MENU DÜYMƏSİ: " .. i.KeyCode.Name
-            c:Disconnect()
-        end
-    end)
-end)
-
--- GİRİŞ
+-- GİRİŞ MƏNTİQİ
 btnLog.MouseButton1Click:Connect(function()
     if inp.Text == "dark" then
         isAuth = true
         log.Visible = false
         Main.Visible = true
     else
+        inp.PlaceholderText = "WRONG CODE"
         inp.Text = ""
-        inp.PlaceholderText = "SƏHV!"
     end
 end)
 
--- TABLAR
-local b1 = Instance.new("TextButton")
-b1.Size = UDim2.new(1, -10, 0, 40)
-b1.Position = UDim2.new(0, 5, 0, 10)
-b1.Text = "PLAYER"
-b1.Parent = side
-b1.MouseButton1Click:Connect(function() pPage.Visible = true wPage.Visible = false end)
-
-local b2 = Instance.new("TextButton")
-b2.Size = UDim2.new(1, -10, 0, 40)
-b2.Position = UDim2.new(0, 5, 0, 55)
-b2.Text = "WORLD"
-b2.Parent = side
-b2.MouseButton1Click:Connect(function() pPage.Visible = false wPage.Visible = true end)
-
--- FİZİKA (Dönmə 0.08 geri alındı)
-RunService.Heartbeat:Connect(function()
+-- FİZİKA (Sənin dediyin köhnə sabit ayarlarla)
+RunService.Stepped:Connect(function()
     if not isAuth then return end
     local char = Players.LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
@@ -164,6 +145,18 @@ RunService.Heartbeat:Connect(function()
             if conf.trn and seat.Steer ~= 0 then
                 seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -seat.Steer * 0.08, 0)
             end
+            if conf.stab then
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + Vector3.new(0, -1.5, 0)
+            end
+            if conf.noclip then
+                for _, part in pairs(seat.Parent:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = false end
+                end
+            else
+                for _, part in pairs(seat.Parent:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = true end
+                end
+            end
         end
     end
 end)
@@ -172,3 +165,5 @@ end)
 UserInputService.InputBegan:Connect(function(i, g)
     if isAuth and not g and i.KeyCode == menuKey then Main.Visible = not Main.Visible end
 end)
+
+print("Dark Hub V17 - Black & White Loaded. Code: dark")
