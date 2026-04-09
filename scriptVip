@@ -1,11 +1,10 @@
--- [[ DARK HUB V18 - MINIMALIST PRO EDITION ]] --
+-- [[ DARK HUB V30 - INSTAGRAM TAG & LOGIN ]] --
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 
--- Köhnə interfeysləri mütləq sil
+-- Köhnə interfeysləri təmizlə
 for _, v in pairs(CoreGui:GetChildren()) do
     if v:IsA("ScreenGui") and (v.Name:find("Dark") or v.Name:find("Omur")) then
         v:Destroy()
@@ -13,42 +12,77 @@ for _, v in pairs(CoreGui:GetChildren()) do
 end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "DarkHubV18"
+gui.Name = "DarkHubV30"
 gui.Parent = CoreGui
 gui.ResetOnSpawn = false
 
 local isAuth = false
 local menuKey = Enum.KeyCode.K
+local waitingForKey = false
 
--- 1. LOGIN PANEL (Minimalist)
+-- 1. LOGIN PANEL (Yenilənmiş Dizayn)
 local log = Instance.new("Frame")
-log.Size = UDim2.new(0, 280, 0, 150)
-log.Position = UDim2.new(0.5, -140, 0.5, -75)
-log.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-log.BorderSizePixel = 2
-log.BorderColor3 = Color3.fromRGB(255, 255, 255)
+log.Size = UDim2.new(0, 320, 0, 240)
+log.Position = UDim2.new(0.5, -160, 0.5, -120)
+log.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
 log.Parent = gui
 Instance.new("UICorner", log)
 
+local logTitle = Instance.new("TextLabel")
+logTitle.Size = UDim2.new(1, 0, 0, 40)
+logTitle.Text = "DARK HUB AUTHORIZATION"
+logTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+logTitle.Font = Enum.Font.Code
+logTitle.BackgroundTransparency = 1
+logTitle.Parent = log
+
+-- Instagram Yazısı (TƏZƏ ƏLAVƏ)
+local instaLabel = Instance.new("TextLabel")
+instaLabel.Size = UDim2.new(0, 100, 0, 20)
+instaLabel.Position = UDim2.new(0.5, -115, 0.28, 0) -- User hissəsinin üstü
+instaLabel.Text = "Instagram:"
+instaLabel.TextColor3 = Color3.fromRGB(150, 150, 150) -- Boz rəng
+instaLabel.Font = Enum.Font.Code
+instaLabel.TextSize = 12
+instaLabel.TextXAlignment = Enum.TextXAlignment.Left
+instaLabel.BackgroundTransparency = 1
+instaLabel.Parent = log
+
+-- User hissəsi (The.Omur.Hesenli)
+local userShow = Instance.new("TextBox")
+userShow.Size = UDim2.new(0, 240, 0, 35)
+userShow.Position = UDim2.new(0.5, -120, 0.35, 0)
+userShow.Text = "The.Omur.Hesenli"
+userShow.ClearTextOnFocus = false
+userShow.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+userShow.TextColor3 = Color3.fromRGB(0, 255, 0) -- Yaşıl rəng
+userShow.Font = Enum.Font.Code
+userShow.Parent = log
+Instance.new("UICorner", userShow).CornerRadius = UDim.new(0, 4)
+
+-- Key hissəsi (dark)
 local inp = Instance.new("TextBox")
-inp.Size = UDim2.new(0, 200, 0, 30)
-inp.Position = UDim2.new(0.5, -100, 0.4, 0)
-inp.PlaceholderText = "Kod: dark"
+inp.Size = UDim2.new(0, 240, 0, 35)
+inp.Position = UDim2.new(0.5, -120, 0.58, 0)
+inp.PlaceholderText = "> ENTER ACCESS KEY"
 inp.Text = ""
-inp.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+inp.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 inp.TextColor3 = Color3.fromRGB(255, 255, 255)
+inp.Font = Enum.Font.Code
 inp.Parent = log
+Instance.new("UICorner", inp).CornerRadius = UDim.new(0, 4)
 
 local btnLog = Instance.new("TextButton")
-btnLog.Size = UDim2.new(0, 100, 0, 35)
-btnLog.Position = UDim2.new(0.5, -50, 0.7, 0)
-btnLog.Text = "LOGIN"
+btnLog.Size = UDim2.new(0, 120, 0, 35)
+btnLog.Position = UDim2.new(0.5, -60, 0.85, 0)
+btnLog.Text = "[ LOGIN ]"
 btnLog.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 btnLog.TextColor3 = Color3.fromRGB(0, 0, 0)
-btnLog.Font = Enum.Font.GothamBold
+btnLog.Font = Enum.Font.Code
 btnLog.Parent = log
+Instance.new("UICorner", btnLog).CornerRadius = UDim.new(0, 4)
 
--- 2. ANA MENU (BLACK & WHITE PRO)
+-- 2. ANA MENU STRUKTURU (SABİT)
 local Main = Instance.new("Frame")
 Main.Size = UDim2.new(0, 450, 0, 350)
 Main.Position = UDim2.new(0.5, -225, 0.5, -175)
@@ -61,60 +95,45 @@ Main.Draggable = true
 Main.Parent = gui
 Instance.new("UICorner", Main)
 
--- SOL PANEL (TABS)
-local Tabs = Instance.new("Frame")
-Tabs.Size = UDim2.new(0, 110, 1, 0)
-Tabs.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Tabs.BorderSizePixel = 0
-Tabs.Parent = Main
-Instance.new("UICorner", Tabs)
-
--- SƏHİFƏLƏR
-local PlayerPage = Instance.new("ScrollingFrame")
-PlayerPage.Size = UDim2.new(1, -130, 1, -20)
-PlayerPage.Position = UDim2.new(0, 120, 0, 10)
-PlayerPage.BackgroundTransparency = 1
-PlayerPage.Visible = true
-PlayerPage.Parent = Main
-
-local WorldPage = Instance.new("ScrollingFrame")
-WorldPage.Size = UDim2.new(1, -130, 1, -20)
-WorldPage.Position = UDim2.new(0, 120, 0, 10)
-WorldPage.BackgroundTransparency = 1
-WorldPage.Visible = false
-WorldPage.Parent = Main
-
-Instance.new("UIListLayout", PlayerPage).Padding = UDim.new(0, 5)
-Instance.new("UIListLayout", WorldPage).Padding = UDim.new(0, 5)
-
--- AYARLAR SİSTEMİ
-local conf = { 
-    espName = false, espBox = false, espLine = false, 
-    spd = false, brk = true, trn = true, stab = true, noclip = false 
-}
-
--- EXIT DÜYMƏSİ (X)
 local xBtn = Instance.new("TextButton")
-xBtn.Size = UDim2.new(0, 25, 0, 25)
-xBtn.Position = UDim2.new(1, -30, 0, 5)
+xBtn.Size = UDim2.new(0, 30, 0, 30)
+xBtn.Position = UDim2.new(1, -30, 0, 0)
 xBtn.Text = "X"
-xBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+xBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 xBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 xBtn.Parent = Main
 xBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
--- FUNKSİYA: DÜYMƏ YARATMA
+local Tabs = Instance.new("Frame")
+Tabs.Size = UDim2.new(0, 110, 1, 0)
+Tabs.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Tabs.Parent = Main
+
+local PlayerPage = Instance.new("ScrollingFrame")
+local WorldPage = Instance.new("ScrollingFrame")
+local ConfigPage = Instance.new("ScrollingFrame")
+
+for _, p in pairs({PlayerPage, WorldPage, ConfigPage}) do
+    p.Size = UDim2.new(1, -130, 1, -40)
+    p.Position = UDim2.new(0, 120, 0, 20)
+    p.BackgroundTransparency = 1
+    p.Visible = false
+    p.Parent = Main
+    Instance.new("UIListLayout", p).Padding = UDim.new(0, 5)
+end
+PlayerPage.Visible = true
+
+-- AYARLAR DEYİŞƏNLƏRİ
+local conf = { espName = false, espSkeleton = false, espLine = false, spd = false, brk = false }
+
 local function makeToggle(name, parent, key)
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(1, -5, 0, 35)
     b.Text = name .. ": OFF"
     b.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
-    b.BorderSizePixel = 1
-    b.BorderColor3 = Color3.fromRGB(80, 80, 80)
     b.Parent = parent
     Instance.new("UICorner", b)
-
     b.MouseButton1Click:Connect(function()
         conf[key] = not conf[key]
         b.Text = name .. (conf[key] and ": ON" or ": OFF")
@@ -123,130 +142,113 @@ local function makeToggle(name, parent, key)
     end)
 end
 
--- TAB DÜYMƏLƏRİ
 local function makeTab(name, pos, page)
     local t = Instance.new("TextButton")
     t.Size = UDim2.new(1, -10, 0, 45)
     t.Position = pos
     t.Text = name
-    t.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    t.TextColor3 = Color3.fromRGB(255, 255, 255)
     t.Parent = Tabs
-    t.MouseButton1Click:Connect(function()
-        PlayerPage.Visible = false
-        WorldPage.Visible = false
-        page.Visible = true
+    t.MouseButton1Click:Connect(function() 
+        PlayerPage.Visible = false WorldPage.Visible = false ConfigPage.Visible = false 
+        page.Visible = true 
     end)
 end
 
 makeTab("PLAYER", UDim2.new(0, 5, 0, 10), PlayerPage)
 makeTab("WORLD", UDim2.new(0, 5, 0, 60), WorldPage)
+makeTab("CONFIG", UDim2.new(0, 5, 0, 110), ConfigPage)
 
--- DÜYMƏLƏRİ ƏLAVƏ ET
 makeToggle("ESP NAME", PlayerPage, "espName")
-makeToggle("ESP BOX", PlayerPage, "espBox")
+makeToggle("ESP RGB SKELETON", PlayerPage, "espSkeleton")
 makeToggle("ESP LINE", PlayerPage, "espLine")
+makeToggle("HIZLI SURUS (SPEED)", WorldPage, "spd")
+makeToggle("AKILLI TORMOZ (BRAKE)", WorldPage, "brk")
 
-makeToggle("HIZLI SURUS", WorldPage, "spd")
-makeToggle("AKILLI TORMOZ", WorldPage, "brk")
-makeToggle("RAHAT DONME", WorldPage, "trn")
-makeToggle("STABILLIK", WorldPage, "stab")
-makeToggle("CAR NOCLIP", WorldPage, "noclip")
+-- CONFIG
+local keyBtn = Instance.new("TextButton")
+keyBtn.Size = UDim2.new(1, -5, 0, 40)
+keyBtn.Text = "MENU DÜYMƏSİ: K"
+keyBtn.Parent = ConfigPage
+Instance.new("UICorner", keyBtn)
 
--- LOGIN MƏNTİQİ
-btnLog.MouseButton1Click:Connect(function()
-    if inp.Text == "dark" then
-        isAuth = true
-        log.Visible = false
-        Main.Visible = true
-    else
-        inp.PlaceholderText = "WRONG!"
-        inp.Text = ""
+keyBtn.MouseButton1Click:Connect(function()
+    keyBtn.Text = "... DÜYMƏNİ BASIN ..."
+    waitingForKey = true
+end)
+
+UserInputService.InputBegan:Connect(function(i, g)
+    if waitingForKey and not g then
+        menuKey = i.KeyCode
+        keyBtn.Text = "MENU DÜYMƏSİ: " .. i.KeyCode.Name
+        waitingForKey = false
+    elseif isAuth and not g and i.KeyCode == menuKey then
+        Main.Visible = not Main.Visible
     end
 end)
 
--- ESP SİSTEMİ (Name, Box, Line) - Polislər Göy, Digərləri Qırmızı
+-- [ GİRİŞ YOXLAMA LOGİKASI ] --
+btnLog.MouseButton1Click:Connect(function()
+    if userShow.Text == "The.Omur.Hesenli" and inp.Text == "dark" then 
+        isAuth = true 
+        log.Visible = false 
+        Main.Visible = true 
+    end
+end)
+
+-- ESP SİSTEMİ (SABİT)
 local function createESP(plr)
-    local line = Drawing.new("Line")
-    local box = Drawing.new("Square")
-    local text = Drawing.new("Text")
+    local limbs = {{"Head", "UpperTorso"}, {"UpperTorso", "LowerTorso"}, {"UpperTorso", "LeftUpperArm"}, {"LeftUpperArm", "LeftLowerArm"}, {"UpperTorso", "RightUpperArm"}, {"RightUpperArm", "RightLowerArm"}, {"LowerTorso", "LeftUpperLeg"}, {"LeftUpperLeg", "LeftLowerLeg"}, {"LowerTorso", "RightUpperLeg"}, {"RightUpperLeg", "RightLowerLeg"}}
+    local skelLines = {}
+    for i = 1, #limbs do skelLines[i] = Drawing.new("Line") skelLines[i].Thickness = 2 end
+    local nameTag = Drawing.new("Text") nameTag.Size = 18 nameTag.Center = true nameTag.Outline = true
+    local lineEsp = Drawing.new("Line") lineEsp.Thickness = 1
 
     RunService.RenderStepped:Connect(function()
         if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr ~= Players.LocalPlayer then
-            local hrp = plr.Character.HumanoidRootPart
-            local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(hrp.Position)
-            local color = (plr.Team and plr.Team.Name == "Police") and Color3.new(0, 0, 1) or Color3.new(1, 0, 0)
-
+            local char = plr.Character
+            local cam = workspace.CurrentCamera
+            local rootPos, onScreen = cam:WorldToViewportPoint(char.HumanoidRootPart.Position)
+            local rgbColor = Color3.fromHSV(tick() % 3 / 3, 1, 1)
+            
             if onScreen then
-                if conf.espLine then
-                    line.Visible = true
-                    line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
-                    line.To = Vector2.new(pos.X, pos.Y)
-                    line.Color = color
-                else line.Visible = false end
-
-                if conf.espBox then
-                    box.Visible = true
-                    box.Size = Vector2.new(2000 / pos.Z, 2500 / pos.Z)
-                    box.Position = Vector2.new(pos.X - box.Size.X / 2, pos.Y - box.Size.Y / 2)
-                    box.Color = color
-                    box.Thickness = 1
-                else box.Visible = false end
-
-                if conf.espName then
-                    text.Visible = true
-                    text.Text = plr.Name
-                    text.Position = Vector2.new(pos.X, pos.Y - (2500 / pos.Z) / 2 - 15)
-                    text.Color = color
-                    text.Center = true
-                    text.Outline = true
-                else text.Visible = false end
-            else
-                line.Visible = false box.Visible = false text.Visible = false
-            end
-        else
-            line.Visible = false box.Visible = false text.Visible = false
-        end
+                if conf.espName then nameTag.Visible = true nameTag.Text = plr.Name nameTag.Position = Vector2.new(rootPos.X, rootPos.Y - 50) nameTag.Color = Color3.new(1, 1, 1) else nameTag.Visible = false end
+                if conf.espLine then lineEsp.Visible = true lineEsp.From = Vector2.new(cam.ViewportSize.X/2, cam.ViewportSize.Y) lineEsp.To = Vector2.new(rootPos.X, rootPos.Y) lineEsp.Color = Color3.new(1,1,1) else lineEsp.Visible = false end
+                if conf.espSkeleton then
+                    for i, bone in pairs(limbs) do
+                        local pA, pB = char:FindFirstChild(bone[1]), char:FindFirstChild(bone[2])
+                        if pA and pB then
+                            local posA, onA = cam:WorldToViewportPoint(pA.Position)
+                            local posB, onB = cam:WorldToViewportPoint(pB.Position)
+                            if onA and onB then skelLines[i].Visible = true skelLines[i].From = Vector2.new(posA.X, posA.Y) skelLines[i].To = Vector2.new(posB.X, posB.Y) skelLines[i].Color = rgbColor else skelLines[i].Visible = false end
+                        else skelLines[i].Visible = false end
+                    end
+                else for i=1, #skelLines do skelLines[i].Visible = false end end
+            else nameTag.Visible = false lineEsp.Visible = false for i=1,#skelLines do skelLines[i].Visible = false end end
+        else nameTag.Visible = false lineEsp.Visible = false for i=1,#skelLines do skelLines[i].Visible = false end end
     end)
 end
 
 for _, p in pairs(Players:GetPlayers()) do createESP(p) end
 Players.PlayerAdded:Connect(createESP)
 
--- FİZİKA (Sənin istədiyin sabit 0.08 dönmə ilə)
+-- [ MAŞIN SÜRƏT VƏ FREN ] --
 RunService.Stepped:Connect(function()
     if not isAuth then return end
     local char = Players.LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
         local seat = char.Humanoid.SeatPart
         if seat and seat:IsA("VehicleSeat") then
-            if conf.spd and seat.Throttle == 1 then
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
+            -- Speed
+            if conf.spd and seat.Throttle == 1 then 
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 0.6) 
             end
+            -- Brake
             if conf.brk and seat.Throttle == -1 then
-                local v = seat.CFrame:VectorToObjectSpace(seat.AssemblyLinearVelocity)
-                if v.Z < -2 then seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.96 end
-            end
-            if conf.trn and seat.Steer ~= 0 then
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -seat.Steer * 0.08, 0)
-            end
-            if conf.stab then
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + Vector3.new(0, -1.5, 0)
-            end
-            if conf.noclip then
-                for _, part in pairs(seat.Parent:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = false end
-                end
-            else
-                for _, part in pairs(seat.Parent:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = true end
+                local localVel = seat.CFrame:VectorToObjectSpace(seat.AssemblyLinearVelocity)
+                if localVel.Z < -1 then
+                    seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.94
                 end
             end
         end
     end
-end)
-
--- GİZLƏ/AÇ
-UserInputService.InputBegan:Connect(function(i, g)
-    if isAuth and not g and i.KeyCode == menuKey then Main.Visible = not Main.Visible end
 end)
