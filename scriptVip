@@ -1,8 +1,9 @@
--- [[ DARK HUB V17 - BLACK & WHITE MINIMALIST EDITION ]] --
+-- [[ DARK HUB V18 - MINIMALIST PRO EDITION ]] --
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
 
 -- Köhnə interfeysləri mütləq sil
 for _, v in pairs(CoreGui:GetChildren()) do
@@ -12,14 +13,14 @@ for _, v in pairs(CoreGui:GetChildren()) do
 end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "DarkHubV17"
+gui.Name = "DarkHubV18"
 gui.Parent = CoreGui
-gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
 
 local isAuth = false
 local menuKey = Enum.KeyCode.K
 
--- LOGIN PANEL (Ağ-Qara Rejim)
+-- 1. LOGIN PANEL (Minimalist)
 local log = Instance.new("Frame")
 log.Size = UDim2.new(0, 280, 0, 150)
 log.Position = UDim2.new(0.5, -140, 0.5, -75)
@@ -27,19 +28,11 @@ log.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 log.BorderSizePixel = 2
 log.BorderColor3 = Color3.fromRGB(255, 255, 255)
 log.Parent = gui
-Instance.new("UICorner", log).CornerRadius = UDim.new(0, 5)
-
-local logTitle = Instance.new("TextLabel")
-logTitle.Size = UDim2.new(1, 0, 0, 35)
-logTitle.Text = "DARK HUB ACCESS"
-logTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-logTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-logTitle.Font = Enum.Font.GothamBold
-logTitle.Parent = log
+Instance.new("UICorner", log)
 
 local inp = Instance.new("TextBox")
 inp.Size = UDim2.new(0, 200, 0, 30)
-inp.Position = UDim2.new(0.5, -100, 0.45, 0)
+inp.Position = UDim2.new(0.5, -100, 0.4, 0)
 inp.PlaceholderText = "Kod: dark"
 inp.Text = ""
 inp.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -47,18 +40,18 @@ inp.TextColor3 = Color3.fromRGB(255, 255, 255)
 inp.Parent = log
 
 local btnLog = Instance.new("TextButton")
-btnLog.Size = UDim2.new(0, 100, 0, 30)
-btnLog.Position = UDim2.new(0.5, -50, 0.75, 0)
-btnLog.Text = "ENTER"
+btnLog.Size = UDim2.new(0, 100, 0, 35)
+btnLog.Position = UDim2.new(0.5, -50, 0.7, 0)
+btnLog.Text = "LOGIN"
 btnLog.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 btnLog.TextColor3 = Color3.fromRGB(0, 0, 0)
 btnLog.Font = Enum.Font.GothamBold
 btnLog.Parent = log
 
--- ANA MENU
+-- 2. ANA MENU (BLACK & WHITE PRO)
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 350, 0, 400)
-Main.Position = UDim2.new(0.5, -175, 0.5, -200)
+Main.Size = UDim2.new(0, 450, 0, 350)
+Main.Position = UDim2.new(0.5, -225, 0.5, -175)
 Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Main.BorderSizePixel = 2
 Main.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -66,69 +59,161 @@ Main.Visible = false
 Main.Active = true
 Main.Draggable = true
 Main.Parent = gui
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", Main)
 
--- MENU SİLMƏ QUTUCUĞU (X)
-local exitBtn = Instance.new("TextButton")
-exitBtn.Size = UDim2.new(0, 30, 0, 30)
-exitBtn.Position = UDim2.new(1, -35, 0, 5)
-exitBtn.Text = "X"
-exitBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-exitBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-exitBtn.Font = Enum.Font.GothamBold
-exitBtn.Parent = Main
-Instance.new("UICorner", exitBtn)
-exitBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+-- SOL PANEL (TABS)
+local Tabs = Instance.new("Frame")
+Tabs.Size = UDim2.new(0, 110, 1, 0)
+Tabs.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Tabs.BorderSizePixel = 0
+Tabs.Parent = Main
+Instance.new("UICorner", Tabs)
 
-local pPage = Instance.new("ScrollingFrame")
-pPage.Size = UDim2.new(1, -20, 1, -60)
-pPage.Position = UDim2.new(0, 10, 0, 40)
-pPage.BackgroundTransparency = 1
-pPage.ScrollBarThickness = 2
-pPage.Parent = Main
-Instance.new("UIListLayout", pPage).Padding = UDim.new(0, 8)
+-- SƏHİFƏLƏR
+local PlayerPage = Instance.new("ScrollingFrame")
+PlayerPage.Size = UDim2.new(1, -130, 1, -20)
+PlayerPage.Position = UDim2.new(0, 120, 0, 10)
+PlayerPage.BackgroundTransparency = 1
+PlayerPage.Visible = true
+PlayerPage.Parent = Main
 
--- AYARLAR
-local conf = { spd = false, brk = true, trn = true, stab = true, noclip = false }
+local WorldPage = Instance.new("ScrollingFrame")
+WorldPage.Size = UDim2.new(1, -130, 1, -20)
+WorldPage.Position = UDim2.new(0, 120, 0, 10)
+WorldPage.BackgroundTransparency = 1
+WorldPage.Visible = false
+WorldPage.Parent = Main
 
-local function tgl(txt, key)
+Instance.new("UIListLayout", PlayerPage).Padding = UDim.new(0, 5)
+Instance.new("UIListLayout", WorldPage).Padding = UDim.new(0, 5)
+
+-- AYARLAR SİSTEMİ
+local conf = { 
+    espName = false, espBox = false, espLine = false, 
+    spd = false, brk = true, trn = true, stab = true, noclip = false 
+}
+
+-- EXIT DÜYMƏSİ (X)
+local xBtn = Instance.new("TextButton")
+xBtn.Size = UDim2.new(0, 25, 0, 25)
+xBtn.Position = UDim2.new(1, -30, 0, 5)
+xBtn.Text = "X"
+xBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+xBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+xBtn.Parent = Main
+xBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- FUNKSİYA: DÜYMƏ YARATMA
+local function makeToggle(name, parent, key)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, 0, 0, 40)
-    b.Text = txt .. ": OFF"
-    b.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    b.Size = UDim2.new(1, -5, 0, 35)
+    b.Text = name .. ": OFF"
+    b.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
     b.BorderSizePixel = 1
-    b.BorderColor3 = Color3.fromRGB(100, 100, 100)
-    b.Font = Enum.Font.Gotham
-    b.Parent = pPage
-    
+    b.BorderColor3 = Color3.fromRGB(80, 80, 80)
+    b.Parent = parent
+    Instance.new("UICorner", b)
+
     b.MouseButton1Click:Connect(function()
         conf[key] = not conf[key]
-        b.Text = txt .. (conf[key] and ": ON" or ": OFF")
-        b.BackgroundColor3 = conf[key] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(20, 20, 20)
+        b.Text = name .. (conf[key] and ": ON" or ": OFF")
+        b.BackgroundColor3 = conf[key] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(25, 25, 25)
         b.TextColor3 = conf[key] and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
     end)
 end
 
-tgl("HIZLI SURUS", "spd")
-tgl("AKILLI TORMOZ", "brk")
-tgl("RAHAT DONME", "trn")
-tgl("STABILLIK", "stab")
-tgl("CAR NOCLIP", "noclip")
+-- TAB DÜYMƏLƏRİ
+local function makeTab(name, pos, page)
+    local t = Instance.new("TextButton")
+    t.Size = UDim2.new(1, -10, 0, 45)
+    t.Position = pos
+    t.Text = name
+    t.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    t.TextColor3 = Color3.fromRGB(255, 255, 255)
+    t.Parent = Tabs
+    t.MouseButton1Click:Connect(function()
+        PlayerPage.Visible = false
+        WorldPage.Visible = false
+        page.Visible = true
+    end)
+end
 
--- GİRİŞ MƏNTİQİ
+makeTab("PLAYER", UDim2.new(0, 5, 0, 10), PlayerPage)
+makeTab("WORLD", UDim2.new(0, 5, 0, 60), WorldPage)
+
+-- DÜYMƏLƏRİ ƏLAVƏ ET
+makeToggle("ESP NAME", PlayerPage, "espName")
+makeToggle("ESP BOX", PlayerPage, "espBox")
+makeToggle("ESP LINE", PlayerPage, "espLine")
+
+makeToggle("HIZLI SURUS", WorldPage, "spd")
+makeToggle("AKILLI TORMOZ", WorldPage, "brk")
+makeToggle("RAHAT DONME", WorldPage, "trn")
+makeToggle("STABILLIK", WorldPage, "stab")
+makeToggle("CAR NOCLIP", WorldPage, "noclip")
+
+-- LOGIN MƏNTİQİ
 btnLog.MouseButton1Click:Connect(function()
     if inp.Text == "dark" then
         isAuth = true
         log.Visible = false
         Main.Visible = true
     else
-        inp.PlaceholderText = "WRONG CODE"
+        inp.PlaceholderText = "WRONG!"
         inp.Text = ""
     end
 end)
 
--- FİZİKA (Sənin dediyin köhnə sabit ayarlarla)
+-- ESP SİSTEMİ (Name, Box, Line) - Polislər Göy, Digərləri Qırmızı
+local function createESP(plr)
+    local line = Drawing.new("Line")
+    local box = Drawing.new("Square")
+    local text = Drawing.new("Text")
+
+    RunService.RenderStepped:Connect(function()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr ~= Players.LocalPlayer then
+            local hrp = plr.Character.HumanoidRootPart
+            local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(hrp.Position)
+            local color = (plr.Team and plr.Team.Name == "Police") and Color3.new(0, 0, 1) or Color3.new(1, 0, 0)
+
+            if onScreen then
+                if conf.espLine then
+                    line.Visible = true
+                    line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                    line.To = Vector2.new(pos.X, pos.Y)
+                    line.Color = color
+                else line.Visible = false end
+
+                if conf.espBox then
+                    box.Visible = true
+                    box.Size = Vector2.new(2000 / pos.Z, 2500 / pos.Z)
+                    box.Position = Vector2.new(pos.X - box.Size.X / 2, pos.Y - box.Size.Y / 2)
+                    box.Color = color
+                    box.Thickness = 1
+                else box.Visible = false end
+
+                if conf.espName then
+                    text.Visible = true
+                    text.Text = plr.Name
+                    text.Position = Vector2.new(pos.X, pos.Y - (2500 / pos.Z) / 2 - 15)
+                    text.Color = color
+                    text.Center = true
+                    text.Outline = true
+                else text.Visible = false end
+            else
+                line.Visible = false box.Visible = false text.Visible = false
+            end
+        else
+            line.Visible = false box.Visible = false text.Visible = false
+        end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do createESP(p) end
+Players.PlayerAdded:Connect(createESP)
+
+-- FİZİKA (Sənin istədiyin sabit 0.08 dönmə ilə)
 RunService.Stepped:Connect(function()
     if not isAuth then return end
     local char = Players.LocalPlayer.Character
@@ -165,5 +250,3 @@ end)
 UserInputService.InputBegan:Connect(function(i, g)
     if isAuth and not g and i.KeyCode == menuKey then Main.Visible = not Main.Visible end
 end)
-
-print("Dark Hub V17 - Black & White Loaded. Code: dark")
