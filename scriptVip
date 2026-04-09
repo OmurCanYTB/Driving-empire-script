@@ -1,29 +1,25 @@
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
 
--- Əvvəlki paneli təmizləyirik
-if CoreGui:FindFirstChild("OmurProHub") then CoreGui.OmurProHub:Destroy() end
+if CoreGui:FindFirstChild("OmurProV6") then CoreGui.OmurProV6:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurProHub"
+gui.Name = "OmurProV6"
 gui.Parent = CoreGui
-gui.ResetOnSpawn = false
 
--- ANA PANEL
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 260, 0, 320)
-frame.Position = UDim2.new(0.5, -130, 0.5, -160)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.Size = UDim2.new(0, 260, 0, 420) -- Paneli biraz böyütdük yeni özəlliklər üçün
+frame.Position = UDim2.new(0.5, -130, 0.5, -210)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
-frame.Visible = true
 frame.Parent = gui
 
--- YUXARI BAR
+-- Dekorasiya və Başlıq
 local topBar = Instance.new("Frame")
 topBar.Size = UDim2.new(1, 0, 0, 40)
 topBar.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
@@ -32,115 +28,134 @@ topBar.Parent = frame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "Ömür VIP (K - Gizlət)"
+title.Text = "Ömür Ultimate V6"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.SourceSansBold
-title.TextSize = 16
+title.TextSize = 18
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = topBar
 
--- BAĞLAMA DÜYMƏSİ (TAM SİLMƏK)
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 35, 0, 35)
-closeBtn.Position = UDim2.new(1, -37, 0, 2)
-closeBtn.Text = "X"
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.Parent = topBar
-closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 35, 0, 35)
+close.Position = UDim2.new(1, -37, 0, 2)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Parent = topBar
+close.MouseButton1Click:Connect(function() gui:Destroy() end)
 
--- STATUS DƏYİŞƏNLƏRİ
-local state = {
-    speed = false,
-    boost = false,
-    esp = false
+-- Ayarlar (Config)
+local config = { 
+    speed = false, 
+    proBrake = true, 
+    esp = false, 
+    noclip = false,
+    noFog = false 
 }
 
--- DÜYMƏ YARATMA FUNKSİYASI (VİZUAL ON/OFF İLƏ)
-local function createToggle(txt, pos, stateKey, func)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 40)
-    btn.Position = pos
-    btn.Text = txt .. ": OFF"
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.Parent = frame
-    
-    btn.MouseButton1Click:Connect(function()
-        state[stateKey] = not state[stateKey]
-        if state[stateKey] then
-            btn.Text = txt .. ": ON"
-            btn.BackgroundColor3 = Color3.fromRGB(0, 170, 0) -- Yaşıl
-        else
-            btn.Text = txt .. ": OFF"
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Boz
-        end
-        func(state[stateKey])
+local function createTgl(txt, pos, key)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -20, 0, 35)
+    b.Position = pos
+    b.Text = txt .. ": OFF"
+    b.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.Font = Enum.Font.SourceSansBold
+    b.Parent = frame
+    b.MouseButton1Click:Connect(function()
+        config[key] = not config[key]
+        b.Text = txt .. (config[key] and ": ON" or ": OFF")
+        b.BackgroundColor3 = config[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(45, 45, 45)
     end)
 end
 
--- 1. SÜRƏT HACK
-createToggle("HIZLI SURUS", UDim2.new(0, 10, 0, 55), "speed", function() end)
+-- Düymələri düzürük
+createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 50), "speed")
+createTgl("PRO TORMOZ", UDim2.new(0, 10, 0, 95), "proBrake")
+createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 140), "esp")
+createTgl("NOCLIP (DIVAR)", UDim2.new(0, 10, 0, 185), "noclip")
+createTgl("DUMANI SIL", UDim2.new(0, 10, 0, 230), "noFog")
 
--- 2. QALXIŞ BOOST
-createToggle("INSTANT ACCEL", UDim2.new(0, 10, 0, 105), "boost", function() end)
+-- Əlavə: Gündüz düyməsi
+local dayBtn = Instance.new("TextButton")
+dayBtn.Size = UDim2.new(1, -20, 0, 35)
+dayBtn.Position = UDim2.new(0, 10, 0, 275)
+dayBtn.Text = "HER ZAMAN GUNDUZ"
+dayBtn.BackgroundColor3 = Color3.fromRGB(200, 140, 0)
+dayBtn.TextColor3 = Color3.new(1, 1, 1)
+dayBtn.Font = Enum.Font.SourceSansBold
+dayBtn.Parent = frame
+dayBtn.MouseButton1Click:Connect(function()
+    Lighting.ClockTime = 14
+    Lighting.Brightness = 2
+end)
 
--- 3. ESP
-createToggle("ESP", UDim2.new(0, 10, 0, 155), "esp", function(val)
-    for _, p in pairs(Players:GetPlayers()) do
-        if p.Character and p ~= Players.LocalPlayer then
-            if val then
-                local h = Instance.new("Highlight", p.Character)
-                h.Name = "OmurHighlight"
-                h.FillColor = (p.Team and p.Team.Name == "Police") and Color3.new(0,0,1) or Color3.new(1,0,0)
-            else
-                local h = p.Character:FindFirstChild("OmurHighlight")
-                if h then h:Destroy() end
+-- Fizika və Döngülər
+RunService.Stepped:Connect(function()
+    local lp = Players.LocalPlayer
+    local char = lp.Character
+    
+    -- Noclip Məntiqi
+    if config.noclip and char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+
+    -- Maşın Məntiqi
+    if char and char:FindFirstChild("Humanoid") then
+        local seat = char.Humanoid.SeatPart
+        if seat and seat:IsA("VehicleSeat") then
+            -- Sürət (1.8 Sabit)
+            if config.speed and seat.Throttle == 1 then
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
+            end
+            
+            -- PRO TORMOZ (Səlis amma Çox Güclü)
+            if config.proBrake and seat.Throttle == -1 then
+                -- Sürəti 85% azaldır hər kadrda, tam sıfır etmir (sürüşmə hissi verir)
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.85
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.85
+            end
+        end
+    end
+    
+    -- Dumanı Silmə
+    if config.noFog then
+        Lighting.FogEnd = 100000
+        Lighting.Atmosphere:Destroy() -- Əgər varsa atmosfer dumanını silir
+    end
+end)
+
+-- ESP Yeniləmə
+RunService.RenderStepped:Connect(function()
+    if config.esp then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= Players.LocalPlayer and p.Character then
+                if not p.Character:FindFirstChild("OmurHighlight") then
+                    local h = Instance.new("Highlight", p.Character)
+                    h.Name = "OmurHighlight"
+                    h.FillColor = (p.Team and p.Team.Name == "Police") and Color3.new(0,0,1) or Color3.new(1,0,0)
+                end
+            end
+        end
+    else
+        for _, p in pairs(Players:GetPlayers()) do
+            if p.Character and p.Character:FindFirstChild("OmurHighlight") then
+                p.Character.OmurHighlight:Destroy()
             end
         end
     end
 end)
 
--- 4. FULLBRIGHT (GÜNDÜZ)
-local bright = Instance.new("TextButton")
-bright.Size = UDim2.new(1, -20, 0, 40)
-bright.Position = UDim2.new(0, 10, 0, 205)
-bright.Text = "GUNDUZ ET"
-bright.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
-bright.TextColor3 = Color3.new(1, 1, 1)
-bright.Font = Enum.Font.SourceSansBold
-bright.Parent = frame
-bright.MouseButton1Click:Connect(function()
-    Lighting.Brightness = 2
-    Lighting.ClockTime = 14
-    Lighting.GlobalShadows = false
-end)
-
--- GİZLƏTMƏ / AÇMA (K DÜYMƏSİ)
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.K then
+-- Menunu Gizlət (K)
+UserInputService.InputBegan:Connect(function(i, g)
+    if not g and i.KeyCode == Enum.KeyCode.K then
         frame.Visible = not frame.Visible
     end
 end)
 
--- FİZİKA DÖVRÜ (HƏR SANİYƏ YOXLA)
-RunService.Stepped:Connect(function()
-    local char = Players.LocalPlayer.Character
-    if char and char:FindFirstChild("Humanoid") then
-        local seat = char.Humanoid.SeatPart
-        if seat and seat:IsA("VehicleSeat") then
-            -- Sürət Artırma
-            if state.speed and seat.Throttle == 1 then
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
-            end
-            -- Instant Boost
-            if state.boost and seat.Throttle == 1 and seat.AssemblyLinearVelocity.Magnitude < 60 then
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 4)
-            end
-        end
-    end
-end)
-
-print("Ömür Pro Hub V4 Uğurla Yükləndi!")
+print("Omur V6 - En Yeni Versiya Hazırdır!")
