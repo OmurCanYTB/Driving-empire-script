@@ -4,22 +4,22 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 
-if CoreGui:FindFirstChild("OmurProV6") then CoreGui.OmurProV6:Destroy() end
+if CoreGui:FindFirstChild("OmurV7") then CoreGui.OmurV7:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurProV6"
+gui.Name = "OmurV7"
 gui.Parent = CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 260, 0, 420) -- Paneli biraz böyütdük yeni özəlliklər üçün
+frame.Size = UDim2.new(0, 260, 0, 420)
 frame.Position = UDim2.new(0.5, -130, 0.5, -210)
-frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
--- Dekorasiya və Başlıq
+-- Başlıq
 local topBar = Instance.new("Frame")
 topBar.Size = UDim2.new(1, 0, 0, 40)
 topBar.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
@@ -28,7 +28,7 @@ topBar.Parent = frame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "Ömür Ultimate V6"
+title.Text = "Ömür Ultimate V7"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.SourceSansBold
@@ -45,13 +45,13 @@ close.TextColor3 = Color3.new(1, 1, 1)
 close.Parent = topBar
 close.MouseButton1Click:Connect(function() gui:Destroy() end)
 
--- Ayarlar (Config)
+-- Ayarlar
 local config = { 
     speed = false, 
-    proBrake = true, 
+    smoothBrake = true, 
+    easyTurn = true, -- Yeni: Rahat dönmə
     esp = false, 
-    noclip = false,
-    noFog = false 
+    noclip = false 
 }
 
 local function createTgl(txt, pos, key)
@@ -70,42 +70,17 @@ local function createTgl(txt, pos, key)
     end)
 end
 
--- Düymələri düzürük
 createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 50), "speed")
-createTgl("PRO TORMOZ", UDim2.new(0, 10, 0, 95), "proBrake")
-createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 140), "esp")
-createTgl("NOCLIP (DIVAR)", UDim2.new(0, 10, 0, 185), "noclip")
-createTgl("DUMANI SIL", UDim2.new(0, 10, 0, 230), "noFog")
+createTgl("YUMSAQ TORMOZ", UDim2.new(0, 10, 0, 95), "smoothBrake")
+createTgl("RAHAT DONME", UDim2.new(0, 10, 0, 140), "easyTurn")
+createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 185), "esp")
+createTgl("NOCLIP (DIVAR)", UDim2.new(0, 10, 0, 230), "noclip")
 
--- Əlavə: Gündüz düyməsi
-local dayBtn = Instance.new("TextButton")
-dayBtn.Size = UDim2.new(1, -20, 0, 35)
-dayBtn.Position = UDim2.new(0, 10, 0, 275)
-dayBtn.Text = "HER ZAMAN GUNDUZ"
-dayBtn.BackgroundColor3 = Color3.fromRGB(200, 140, 0)
-dayBtn.TextColor3 = Color3.new(1, 1, 1)
-dayBtn.Font = Enum.Font.SourceSansBold
-dayBtn.Parent = frame
-dayBtn.MouseButton1Click:Connect(function()
-    Lighting.ClockTime = 14
-    Lighting.Brightness = 2
-end)
-
--- Fizika və Döngülər
+-- Fizika Dövrü
 RunService.Stepped:Connect(function()
     local lp = Players.LocalPlayer
     local char = lp.Character
     
-    -- Noclip Məntiqi
-    if config.noclip and char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
-    end
-
-    -- Maşın Məntiqi
     if char and char:FindFirstChild("Humanoid") then
         local seat = char.Humanoid.SeatPart
         if seat and seat:IsA("VehicleSeat") then
@@ -114,23 +89,31 @@ RunService.Stepped:Connect(function()
                 seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
             end
             
-            -- PRO TORMOZ (Səlis amma Çox Güclü)
-            if config.proBrake and seat.Throttle == -1 then
-                -- Sürəti 85% azaldır hər kadrda, tam sıfır etmir (sürüşmə hissi verir)
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.85
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.85
+            -- YUMŞAQ TORMOZ (Zəiflədilmiş versiya)
+            if config.smoothBrake and seat.Throttle == -1 then
+                -- 0.85-dən 0.94-ə qaldırdım (rəqəm böyüdükcə tormoz zəifləyir)
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.94
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.94
+            end
+            
+            -- RAHAT DÖNMƏ (Steer Boost)
+            if config.easyTurn and seat.Steer ~= 0 then
+                -- Maşın dönərkən ona əlavə fırlanma gücü verir ki, daha kəskin və rahat dönsün
+                local turnSpeed = seat.Steer * 0.05
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -turnSpeed, 0)
             end
         end
     end
     
-    -- Dumanı Silmə
-    if config.noFog then
-        Lighting.FogEnd = 100000
-        Lighting.Atmosphere:Destroy() -- Əgər varsa atmosfer dumanını silir
+    -- Noclip
+    if config.noclip and char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
     end
 end)
 
--- ESP Yeniləmə
+-- ESP Məntiqi
 RunService.RenderStepped:Connect(function()
     if config.esp then
         for _, p in pairs(Players:GetPlayers()) do
@@ -151,11 +134,9 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Menunu Gizlət (K)
+-- Gizlə (K)
 UserInputService.InputBegan:Connect(function(i, g)
-    if not g and i.KeyCode == Enum.KeyCode.K then
-        frame.Visible = not frame.Visible
-    end
+    if not g and i.KeyCode == Enum.KeyCode.K then frame.Visible = not frame.Visible end
 end)
 
-print("Omur V6 - En Yeni Versiya Hazırdır!")
+print("Omur V7 - Rahat Dönmə və Yumşaq Tormoz Hazırdır!")
