@@ -1,0 +1,114 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+if CoreGui:FindFirstChild("OmurFinal") then CoreGui.OmurFinal:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "OmurFinal"
+gui.Parent = CoreGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 260, 0, 350)
+frame.Position = UDim2.new(0.5, -130, 0.5, -175)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+-- Yuxarı Bar
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 40)
+topBar.BackgroundColor3 = Color3.fromRGB(0, 80, 200)
+topBar.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "Ömür VIP (K: Gizlə)"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.Parent = topBar
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 35, 0, 35)
+close.Position = UDim2.new(1, -37, 0, 2)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Parent = topBar
+close.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- Ayarlar
+local config = { speed = false, brake = true, esp = false }
+
+local function createTgl(txt, pos, key)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -20, 0, 40)
+    b.Position = pos
+    b.Text = txt .. ": OFF"
+    b.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.Font = Enum.Font.SourceSansBold
+    b.Parent = frame
+    b.MouseButton1Click:Connect(function()
+        config[key] = not config[key]
+        b.Text = txt .. (config[key] and ": ON" or ": OFF")
+        b.BackgroundColor3 = config[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
+    end)
+end
+
+createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 55), "speed")
+createTgl("GUCLU TORMOZ", UDim2.new(0, 10, 0, 105), "brake")
+createTgl("ESP", UDim2.new(0, 10, 0, 155), "esp")
+
+-- FİZİKA MOTORU
+RunService.Stepped:Connect(function()
+    local lp = Players.LocalPlayer
+    if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+        local seat = lp.Character.Humanoid.SeatPart
+        if seat and seat:IsA("VehicleSeat") then
+            -- Sürətlənmə (W) - Sənin istədiyin kimi 1.8 sabit qaldı
+            if config.speed and seat.Throttle == 1 then
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
+            end
+            
+            -- GÜCLÜ TORMOZ (S)
+            if config.brake and seat.Throttle == -1 then
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.4
+                if seat.AssemblyLinearVelocity.Magnitude < 5 then
+                    seat.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                end
+            end
+        end
+    end
+end)
+
+-- ESP Məntiqi
+RunService.RenderStepped:Connect(function()
+    if config.esp then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= Players.LocalPlayer and p.Character then
+                if not p.Character:FindFirstChild("Highlight") then
+                    local h = Instance.new("Highlight", p.Character)
+                    h.FillColor = (p.Team and p.Team.Name == "Police") and Color3.new(0,0,1) or Color3.new(1,0,0)
+                end
+            end
+        end
+    else
+        for _, p in pairs(Players:GetPlayers()) do
+            if p.Character and p.Character:FindFirstChild("Highlight") then
+                p.Character.Highlight:Destroy()
+            end
+        end
+    end
+end)
+
+-- Gizlətmə
+UserInputService.InputBegan:Connect(function(i)
+    if i.KeyCode == Enum.KeyCode.K then frame.Visible = not frame.Visible end
+end)
+
+print("Ömür Hub - Stabil Versiya Yükləndi!")
