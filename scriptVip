@@ -3,16 +3,16 @@ local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
-if CoreGui:FindFirstChild("OmurV8") then CoreGui.OmurV8:Destroy() end
+if CoreGui:FindFirstChild("OmurV9") then CoreGui.OmurV9:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurV8"
+gui.Name = "OmurV9"
 gui.Parent = CoreGui
 
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 260, 0, 420)
 frame.Position = UDim2.new(0.5, -130, 0.5, -210)
-frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
@@ -27,7 +27,7 @@ topBar.Parent = frame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "Ömür Ultimate V8"
+title.Text = "Ömür Ultimate V9"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.SourceSansBold
@@ -47,9 +47,9 @@ close.MouseButton1Click:Connect(function() gui:Destroy() end)
 -- Ayarlar
 local config = { 
     speed = false, 
-    extraSoftBrake = true, 
+    softBrake = true, 
     ultraTurn = true,
-    antiFly = true, -- Maşının uçmaması üçün
+    carReach = true, -- Maşın içindən ATM yoxlaması
     esp = false 
 }
 
@@ -70,42 +70,43 @@ local function createTgl(txt, pos, key)
 end
 
 createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 50), "speed")
-createTgl("YUMSAQ TORMOZ", UDim2.new(0, 10, 0, 100), "extraSoftBrake")
-createTgl("MAKSIMUM DONME", UDim2.new(0, 10, 0, 150), "ultraTurn")
-createTgl("UCMA ENGELLI", UDim2.new(0, 10, 0, 200), "antiFly")
+createTgl("YALANCI TORMOZ", UDim2.new(0, 10, 0, 100), "softBrake")
+createTgl("YAG KIMI DONME", UDim2.new(0, 10, 0, 150), "ultraTurn")
+createTgl("MASINDA SOYGUN", UDim2.new(0, 10, 0, 200), "carReach")
 createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 250), "esp")
 
--- Fizika Dövrü
+-- Fizika və ATM Məntiqi
 RunService.Stepped:Connect(function()
-    local char = Players.LocalPlayer.Character
+    local lp = Players.LocalPlayer
+    local char = lp.Character
     if char and char:FindFirstChild("Humanoid") then
         local seat = char.Humanoid.SeatPart
+        
+        -- MAŞININ İÇİNDƏ ATM "E" MESAFESINI ARTIRMA (EXPERIMENT)
+        if config.carReach then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("ProximityPrompt") then
+                    obj.RequiresLineOfSight = false -- Divarın arxasından da görsün
+                    obj.MaxActivationDistance = 20 -- Məsafəni artırırıq
+                end
+            end
+        end
+
         if seat and seat:IsA("VehicleSeat") then
-            
             -- Sürət (1.8 Sabit)
             if config.speed and seat.Throttle == 1 then
                 seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
             end
             
-            -- EXTRA YUMŞAQ TORMOZ (Daha da zəiflədildi)
-            if config.extraSoftBrake and seat.Throttle == -1 then
-                -- 0.94-dən 0.97-yə qaldırıldı (Daha uzun məsafədə dayanacaq)
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.97
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.97
+            -- YUMŞAQ TORMOZ (0.98 - Çox səlis)
+            if config.softBrake and seat.Throttle == -1 then
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.98
             end
             
-            -- ULTRA DÖNMƏ (Daha güclü sükan dəstəyi)
+            -- YAĞ KİMİ DÖNMƏ (Artırılmış güc)
             if config.ultraTurn and seat.Steer ~= 0 then
-                local turnPower = seat.Steer * 0.08 -- 0.05-dən 0.08-ə artırıldı
+                local turnPower = seat.Steer * 0.12 -- Daha da artırıldı
                 seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -turnPower, 0)
-            end
-
-            -- ANTİ-FLY / DOWNFORCE (Maşını yerə basır)
-            if config.antiFly then
-                -- Maşın havaya qalxmağa başlayanda onu aşağı itələyir
-                if seat.Position.Y > 5 then 
-                    seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + Vector3.new(0, -0.5, 0)
-                end
             end
         end
     end
@@ -137,4 +138,4 @@ UserInputService.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.K then frame.Visible = not frame.Visible end
 end)
 
-print("Ömür Hub V8 - Stabil və Yerə Yapışan Versiya Yükləndi!")
+print("Omur V9 Final - Maşında Soyğun Testi Yükləndi!")
