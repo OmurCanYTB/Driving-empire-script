@@ -2,18 +2,17 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 
-if CoreGui:FindFirstChild("OmurV7") then CoreGui.OmurV7:Destroy() end
+if CoreGui:FindFirstChild("OmurV8") then CoreGui.OmurV8:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurV7"
+gui.Name = "OmurV8"
 gui.Parent = CoreGui
 
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 260, 0, 420)
 frame.Position = UDim2.new(0.5, -130, 0.5, -210)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
@@ -28,7 +27,7 @@ topBar.Parent = frame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "Ömür Ultimate V7"
+title.Text = "Ömür Ultimate V8"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.SourceSansBold
@@ -48,10 +47,10 @@ close.MouseButton1Click:Connect(function() gui:Destroy() end)
 -- Ayarlar
 local config = { 
     speed = false, 
-    smoothBrake = true, 
-    easyTurn = true, -- Yeni: Rahat dönmə
-    esp = false, 
-    noclip = false 
+    extraSoftBrake = true, 
+    ultraTurn = true,
+    antiFly = true, -- Maşının uçmaması üçün
+    esp = false 
 }
 
 local function createTgl(txt, pos, key)
@@ -59,76 +58,75 @@ local function createTgl(txt, pos, key)
     b.Size = UDim2.new(1, -20, 0, 35)
     b.Position = pos
     b.Text = txt .. ": OFF"
-    b.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Font = Enum.Font.SourceSansBold
     b.Parent = frame
     b.MouseButton1Click:Connect(function()
         config[key] = not config[key]
         b.Text = txt .. (config[key] and ": ON" or ": OFF")
-        b.BackgroundColor3 = config[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(45, 45, 45)
+        b.BackgroundColor3 = config[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(40, 40, 40)
     end)
 end
 
 createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 50), "speed")
-createTgl("YUMSAQ TORMOZ", UDim2.new(0, 10, 0, 95), "smoothBrake")
-createTgl("RAHAT DONME", UDim2.new(0, 10, 0, 140), "easyTurn")
-createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 185), "esp")
-createTgl("NOCLIP (DIVAR)", UDim2.new(0, 10, 0, 230), "noclip")
+createTgl("YUMSAQ TORMOZ", UDim2.new(0, 10, 0, 100), "extraSoftBrake")
+createTgl("MAKSIMUM DONME", UDim2.new(0, 10, 0, 150), "ultraTurn")
+createTgl("UCMA ENGELLI", UDim2.new(0, 10, 0, 200), "antiFly")
+createTgl("ESP (TEAM)", UDim2.new(0, 10, 0, 250), "esp")
 
 -- Fizika Dövrü
 RunService.Stepped:Connect(function()
-    local lp = Players.LocalPlayer
-    local char = lp.Character
-    
+    local char = Players.LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
         local seat = char.Humanoid.SeatPart
         if seat and seat:IsA("VehicleSeat") then
+            
             -- Sürət (1.8 Sabit)
             if config.speed and seat.Throttle == 1 then
                 seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
             end
             
-            -- YUMŞAQ TORMOZ (Zəiflədilmiş versiya)
-            if config.smoothBrake and seat.Throttle == -1 then
-                -- 0.85-dən 0.94-ə qaldırdım (rəqəm böyüdükcə tormoz zəifləyir)
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.94
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.94
+            -- EXTRA YUMŞAQ TORMOZ (Daha da zəiflədildi)
+            if config.extraSoftBrake and seat.Throttle == -1 then
+                -- 0.94-dən 0.97-yə qaldırıldı (Daha uzun məsafədə dayanacaq)
+                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.97
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity * 0.97
             end
             
-            -- RAHAT DÖNMƏ (Steer Boost)
-            if config.easyTurn and seat.Steer ~= 0 then
-                -- Maşın dönərkən ona əlavə fırlanma gücü verir ki, daha kəskin və rahat dönsün
-                local turnSpeed = seat.Steer * 0.05
-                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -turnSpeed, 0)
+            -- ULTRA DÖNMƏ (Daha güclü sükan dəstəyi)
+            if config.ultraTurn and seat.Steer ~= 0 then
+                local turnPower = seat.Steer * 0.08 -- 0.05-dən 0.08-ə artırıldı
+                seat.AssemblyAngularVelocity = seat.AssemblyAngularVelocity + Vector3.new(0, -turnPower, 0)
             end
-        end
-    end
-    
-    -- Noclip
-    if config.noclip and char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
+
+            -- ANTİ-FLY / DOWNFORCE (Maşını yerə basır)
+            if config.antiFly then
+                -- Maşın havaya qalxmağa başlayanda onu aşağı itələyir
+                if seat.Position.Y > 5 then 
+                    seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + Vector3.new(0, -0.5, 0)
+                end
+            end
         end
     end
 end)
 
--- ESP Məntiqi
+-- ESP
 RunService.RenderStepped:Connect(function()
     if config.esp then
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= Players.LocalPlayer and p.Character then
-                if not p.Character:FindFirstChild("OmurHighlight") then
+                if not p.Character:FindFirstChild("OmurESP") then
                     local h = Instance.new("Highlight", p.Character)
-                    h.Name = "OmurHighlight"
+                    h.Name = "OmurESP"
                     h.FillColor = (p.Team and p.Team.Name == "Police") and Color3.new(0,0,1) or Color3.new(1,0,0)
                 end
             end
         end
     else
         for _, p in pairs(Players:GetPlayers()) do
-            if p.Character and p.Character:FindFirstChild("OmurHighlight") then
-                p.Character.OmurHighlight:Destroy()
+            if p.Character and p.Character:FindFirstChild("OmurESP") then
+                p.Character.OmurESP:Destroy()
             end
         end
     end
@@ -139,4 +137,4 @@ UserInputService.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.K then frame.Visible = not frame.Visible end
 end)
 
-print("Omur V7 - Rahat Dönmə və Yumşaq Tormoz Hazırdır!")
+print("Ömür Hub V8 - Stabil və Yerə Yapışan Versiya Yükləndi!")
