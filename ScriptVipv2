@@ -3,21 +3,21 @@ local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
-if CoreGui:FindFirstChild("OmurFinal") then CoreGui.OmurFinal:Destroy() end
+if CoreGui:FindFirstChild("OmurSuperBrake") then CoreGui.OmurSuperBrake:Destroy() end
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "OmurFinal"
+gui.Name = "OmurSuperBrake"
 gui.Parent = CoreGui
 
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 260, 0, 350)
 frame.Position = UDim2.new(0.5, -130, 0.5, -175)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
--- Yuxarı Bar
+-- Yuxarı Panel
 local topBar = Instance.new("Frame")
 topBar.Size = UDim2.new(1, 0, 0, 40)
 topBar.BackgroundColor3 = Color3.fromRGB(0, 80, 200)
@@ -61,7 +61,7 @@ local function createTgl(txt, pos, key)
 end
 
 createTgl("HIZLI SURUS", UDim2.new(0, 10, 0, 55), "speed")
-createTgl("GUCLU TORMOZ", UDim2.new(0, 10, 0, 105), "brake")
+createTgl("ANINDA TORMOZ", UDim2.new(0, 10, 0, 105), "brake")
 createTgl("ESP", UDim2.new(0, 10, 0, 155), "esp")
 
 -- FİZİKA MOTORU
@@ -70,17 +70,16 @@ RunService.Stepped:Connect(function()
     if lp.Character and lp.Character:FindFirstChild("Humanoid") then
         local seat = lp.Character.Humanoid.SeatPart
         if seat and seat:IsA("VehicleSeat") then
-            -- Sürətlənmə (W) - Sənin istədiyin kimi 1.8 sabit qaldı
+            -- Sürətlənmə (W) - 1.8 Sabit
             if config.speed and seat.Throttle == 1 then
                 seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 1.8)
             end
             
-            -- GÜCLÜ TORMOZ (S)
+            -- SUPER TORMOZ (S)
+            -- S-ə basdığın an bütün hərəkəti dərhal kəsir
             if config.brake and seat.Throttle == -1 then
-                seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.4
-                if seat.AssemblyLinearVelocity.Magnitude < 5 then
-                    seat.AssemblyLinearVelocity = Vector3.new(0,0,0)
-                end
+                seat.AssemblyLinearVelocity = Vector3.new(0,0,0) -- Sürəti sıfırlayır
+                seat.AssemblyAngularVelocity = Vector3.new(0,0,0) -- Fırlanmanı sıfırlayır
             end
         end
     end
@@ -111,4 +110,4 @@ UserInputService.InputBegan:Connect(function(i)
     if i.KeyCode == Enum.KeyCode.K then frame.Visible = not frame.Visible end
 end)
 
-print("Ömür Hub - Stabil Versiya Yükləndi!")
+print("Ömür Hub - Super Tormoz Versiyası Yükləndi!")
