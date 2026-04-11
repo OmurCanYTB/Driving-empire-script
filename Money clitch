@@ -1,0 +1,219 @@
+-- [[ DARK HUB V31 - RACE FARM & LOGIN ]] --
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+-- Köhnə interfeysləri təmizlə
+for _, v in pairs(CoreGui:GetChildren()) do
+    if v:IsA("ScreenGui") and (v.Name:find("Dark") or v.Name:find("Omur")) then
+        v:Destroy()
+    end
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DarkHubV31"
+gui.Parent = CoreGui
+gui.ResetOnSpawn = false
+
+local isAuth = false
+local menuKey = Enum.KeyCode.K
+local waitingForKey = false
+
+-- 1. LOGIN PANEL (Instagram Tag daxil)
+local log = Instance.new("Frame")
+log.Size = UDim2.new(0, 320, 0, 240)
+log.Position = UDim2.new(0.5, -160, 0.5, -120)
+log.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+log.Parent = gui
+Instance.new("UICorner", log)
+
+local logTitle = Instance.new("TextLabel")
+logTitle.Size = UDim2.new(1, 0, 0, 40)
+logTitle.Text = "DARK HUB AUTHORIZATION"
+logTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+logTitle.Font = Enum.Font.Code
+logTitle.BackgroundTransparency = 1
+logTitle.Parent = log
+
+local instaLabel = Instance.new("TextLabel")
+instaLabel.Size = UDim2.new(0, 100, 0, 20)
+instaLabel.Position = UDim2.new(0.5, -115, 0.28, 0)
+instaLabel.Text = "Instagram:"
+instaLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+instaLabel.Font = Enum.Font.Code
+instaLabel.TextSize = 12
+instaLabel.BackgroundTransparency = 1
+instaLabel.Parent = log
+
+local userShow = Instance.new("TextBox")
+userShow.Size = UDim2.new(0, 240, 0, 35)
+userShow.Position = UDim2.new(0.5, -120, 0.35, 0)
+userShow.Text = "The.Omur.Hesenli"
+userShow.ClearTextOnFocus = false
+userShow.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+userShow.TextColor3 = Color3.fromRGB(0, 255, 0)
+userShow.Font = Enum.Font.Code
+userShow.Parent = log
+
+local inp = Instance.new("TextBox")
+inp.Size = UDim2.new(0, 240, 0, 35)
+inp.Position = UDim2.new(0.5, -120, 0.58, 0)
+inp.PlaceholderText = "> KEY: dark"
+inp.Text = ""
+inp.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+inp.TextColor3 = Color3.fromRGB(255, 255, 255)
+inp.Font = Enum.Font.Code
+inp.Parent = log
+
+local btnLog = Instance.new("TextButton")
+btnLog.Size = UDim2.new(0, 120, 0, 35)
+btnLog.Position = UDim2.new(0.5, -60, 0.85, 0)
+btnLog.Text = "[ LOGIN ]"
+btnLog.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+btnLog.TextColor3 = Color3.fromRGB(0, 0, 0)
+btnLog.Font = Enum.Font.Code
+btnLog.Parent = log
+
+-- 2. ANA MENU
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 450, 0, 350)
+Main.Position = UDim2.new(0.5, -225, 0.5, -175)
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 2
+Main.BorderColor3 = Color3.fromRGB(255, 255, 255)
+Main.Visible = false
+Main.Active = true
+Main.Draggable = true
+Main.Parent = gui
+
+local Tabs = Instance.new("Frame")
+Tabs.Size = UDim2.new(0, 110, 1, 0)
+Tabs.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Tabs.Parent = Main
+
+local PlayerPage = Instance.new("ScrollingFrame")
+local WorldPage = Instance.new("ScrollingFrame")
+local ConfigPage = Instance.new("ScrollingFrame")
+
+for _, p in pairs({PlayerPage, WorldPage, ConfigPage}) do
+    p.Size = UDim2.new(1, -130, 1, -40)
+    p.Position = UDim2.new(0, 120, 0, 20)
+    p.BackgroundTransparency = 1
+    p.Visible = false
+    p.Parent = Main
+    Instance.new("UIListLayout", p).Padding = UDim.new(0, 5)
+end
+PlayerPage.Visible = true
+
+local conf = { espName = false, espSkeleton = false, espLine = false, spd = false, brk = false, autoRace = false }
+
+local function makeToggle(name, parent, key)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -5, 0, 35)
+    b.Text = name .. ": OFF"
+    b.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Parent = parent
+    b.MouseButton1Click:Connect(function()
+        conf[key] = not conf[key]
+        b.Text = name .. (conf[key] and ": ON" or ": OFF")
+        b.BackgroundColor3 = conf[key] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(25, 25, 25)
+        b.TextColor3 = conf[key] and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
+    end)
+end
+
+local function makeTab(name, pos, page)
+    local t = Instance.new("TextButton")
+    t.Size = UDim2.new(1, -10, 0, 45)
+    t.Position = pos
+    t.Text = name
+    t.Parent = Tabs
+    t.MouseButton1Click:Connect(function() 
+        PlayerPage.Visible = false WorldPage.Visible = false ConfigPage.Visible = false 
+        page.Visible = true 
+    end)
+end
+
+makeTab("PLAYER", UDim2.new(0, 5, 0, 10), PlayerPage)
+makeTab("WORLD", UDim2.new(0, 5, 0, 60), WorldPage)
+makeTab("CONFIG", UDim2.new(0, 5, 0, 110), ConfigPage)
+
+makeToggle("ESP NAME", PlayerPage, "espName")
+makeToggle("ESP RGB SKELETON", PlayerPage, "espSkeleton")
+makeToggle("ESP LINE", PlayerPage, "espLine")
+makeToggle("HIZLI SURUS", WorldPage, "spd")
+makeToggle("AKILLI TORMOZ", WorldPage, "brk")
+makeToggle("AUTO RACE FARM", WorldPage, "autoRace") -- 3-cü Metod
+
+-- LOGIN CHECK
+btnLog.MouseButton1Click:Connect(function()
+    if userShow.Text == "The.Omur.Hesenli" and inp.Text == "dark" then isAuth = true log.Visible = false Main.Visible = true end
+end)
+
+-- AUTO RACE LOGIC (3. Metod)
+spawn(function()
+    while wait(1) do
+        if isAuth and conf.autoRace then
+            -- Yarış panelində "Join" və ya "Start" düyməsini axtarır
+            local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+            -- Driving Empire üçün xüsusi düymə yoxlaması (Simulyasiya edilmiş klik)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game) -- "E" basaraq yarışa girir
+            wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end
+    end
+end)
+
+-- ESP SİSTEMİ (SABİT)
+local function createESP(plr)
+    local limbs = {{"Head", "UpperTorso"}, {"UpperTorso", "LowerTorso"}, {"UpperTorso", "LeftUpperArm"}, {"LeftUpperArm", "LeftLowerArm"}, {"UpperTorso", "RightUpperArm"}, {"RightUpperArm", "RightLowerArm"}, {"LowerTorso", "LeftUpperLeg"}, {"LeftUpperLeg", "LeftLowerLeg"}, {"LowerTorso", "RightUpperLeg"}, {"RightUpperLeg", "RightLowerLeg"}}
+    local skelLines = {}
+    for i = 1, #limbs do skelLines[i] = Drawing.new("Line") skelLines[i].Thickness = 2 end
+    local nameTag = Drawing.new("Text") nameTag.Size = 18 nameTag.Center = true nameTag.Outline = true
+    local lineEsp = Drawing.new("Line") lineEsp.Thickness = 1
+
+    RunService.RenderStepped:Connect(function()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr ~= Players.LocalPlayer then
+            local char = plr.Character
+            local cam = workspace.CurrentCamera
+            local rootPos, onScreen = cam:WorldToViewportPoint(char.HumanoidRootPart.Position)
+            local rgbColor = Color3.fromHSV(tick() % 3 / 3, 1, 1)
+            
+            if onScreen then
+                if conf.espName then nameTag.Visible = true nameTag.Text = plr.Name nameTag.Position = Vector2.new(rootPos.X, rootPos.Y - 50) nameTag.Color = Color3.new(1, 1, 1) else nameTag.Visible = false end
+                if conf.espLine then lineEsp.Visible = true lineEsp.From = Vector2.new(cam.ViewportSize.X/2, cam.ViewportSize.Y) lineEsp.To = Vector2.new(rootPos.X, rootPos.Y) lineEsp.Color = Color3.new(1,1,1) else lineEsp.Visible = false end
+                if conf.espSkeleton then
+                    for i, bone in pairs(limbs) do
+                        local pA, pB = char:FindFirstChild(bone[1]), char:FindFirstChild(bone[2])
+                        if pA and pB then
+                            local posA, onA = cam:WorldToViewportPoint(pA.Position)
+                            local posB, onB = cam:WorldToViewportPoint(pB.Position)
+                            if onA and onB then skelLines[i].Visible = true skelLines[i].From = Vector2.new(posA.X, posA.Y) skelLines[i].To = Vector2.new(posB.X, posB.Y) skelLines[i].Color = rgbColor else skelLines[i].Visible = false end
+                        else skelLines[i].Visible = false end
+                    end
+                else for i=1, #skelLines do skelLines[i].Visible = false end end
+            else nameTag.Visible = false lineEsp.Visible = false for i=1,#skelLines do skelLines[i].Visible = false end end
+        else nameTag.Visible = false lineEsp.Visible = false for i=1,#skelLines do skelLines[i].Visible = false end end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do createESP(p) end
+Players.PlayerAdded:Connect(createESP)
+
+-- SPEED & BRAKE
+RunService.Stepped:Connect(function()
+    if not isAuth then return end
+    local char = Players.LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local seat = char.Humanoid.SeatPart
+        if seat and seat:IsA("VehicleSeat") then
+            if conf.spd and seat.Throttle == 1 then seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity + (seat.CFrame.LookVector * 0.6) end
+            if conf.brk and seat.Throttle == -1 then
+                local localVel = seat.CFrame:VectorToObjectSpace(seat.AssemblyLinearVelocity)
+                if localVel.Z < -1 then seat.AssemblyLinearVelocity = seat.AssemblyLinearVelocity * 0.94 end
+            end
+        end
+    end
+end)
